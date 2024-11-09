@@ -24,7 +24,6 @@ pip install -r requirements.txt
 
 
 
-
 ## Ollama
 
 To install ollama go to:
@@ -40,3 +39,6 @@ for llama3.2:3b run the following command:
 ```bash
   ollama run llama3.2:3b 
 ```
+
+
+Note: focus was on accuracy (rather than performance), to handle reproducibilty a version with 3 runs has been investigated (final version main.py)

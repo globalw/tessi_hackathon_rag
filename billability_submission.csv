@@ -1,33 +1,35 @@
 ,question,answer,context
-0,"Subject: IMBL Scanner Breakdown - Immediate Repair Required Dear Support Team, We are experiencing a sudden breakdown of our IMBL Scanner, rendering it non-operational. We request immediate assistance for emergency repairs to restore functionality as soon as possible. Thank you for your prompt attention to this matter. Best regards, [Customer Name]",Billable,"19.2 Response Times
-- Emergency Maintenance: For critical issues that render the Equipment non-operational, the Service Provider shall respond within 2 hours of notification and commence repairs within 4 hours."
+0,"Subject: IMBL Scanner Breakdown - Immediate Repair Required Dear Support Team, We are experiencing a sudden breakdown of our IMBL Scanner, rendering it non-operational. We request immediate assistance for emergency repairs to restore functionality as soon as possible. Thank you for your prompt attention to this matter. Best regards, [Customer Name]",True,"19.2 Response Times - Emergency Maintenance: For critical issues that render the Equipment non-operational, the Service Provider shall respond within 2 hours of notification and commence repairs within 4 hours."
 1,"Subject: Scheduled Maintenance Request for IMBL Scanner Dear Support Team, As part of our ongoing maintenance schedule, we request a routine check-up of our IMBL Scanner. Please confirm the scheduled date and time for this service. Thank you. Best regards, [Customer Name]",Not Billable,"19.2. Response Times
 - Routine Maintenance Requests: For non-critical issues, the Service Provider shall respond within 24 hours and schedule service within 48 hours."
-2,"Subject: Request for Software Upgrade on IMBL Scanner Dear Support Team, We would like to upgrade our IMBL Scanner software to the latest version available. Kindly provide details on the upgrade process and any associated costs. Looking forward to your response. Best regards,",Not Billable,"19.2 Response Times - Routine Maintenance Requests: For non-critical issues, the Service Provider shall respond within 24 hours and schedule service within 48 hours."
+2,"Subject: Request for Software Upgrade on IMBL Scanner Dear Support Team, We would like to upgrade our IMBL Scanner software to the latest version available. Kindly provide details on the upgrade process and any associated costs. Looking forward to your response. Best regards,",Not Billable,"19.2. Response Times
+- Routine Maintenance Requests: For non-critical issues, the Service Provider shall respond within 24 hours and schedule service within 48 hours."
 3,"Subject: Request for Additional IMBL Scanner Training Dear Support Team, We are seeking additional training sessions for our staff on the operation of the IMBL Scanner. Please let us know the availability and costs for scheduling a training session. Thank you. Best regards, [Customer Name]",Not Billable,"5. Client Responsibilities
-Provide the Service Provider with reasonable access to the Equipment and facilities. Ensure the Equipment is in suitable condition for maintenance."
+Provide the Service Provider with reasonable access to the Equipment and facilities. Ensure the Equipment is in suitable condition for maintenance.
+6. Confidentiality
+The Service Provider agrees to maintain the confidentiality of any proprietary information received during the course of this Agreement and shall not disclose it without the Client's written consent.
+9. Limitation of Liability
+Neither party shall be liable for any indirect, incidental, or consequential damages arising out of this Agreement."
 4,"Subject: Request for Replacement of Defective IMBL Scanner Part Dear Support Team, We have identified a defective part in our IMBL Scanner that needs replacement. The part should be covered under warranty. Kindly assist with the replacement process at the earliest. Thank you. Best regards, [Customer Name]",Not Billable,"19.6. Penalties
 - Service Credits: If the Service Provider fails to meet the uptime guarantee or response and repair times specified, the Client is entitled to service credits as follows:
   - Uptime below 99% but above 95%: Credit of 5% of the monthly fee.
   - Uptime below 95%: Credit of 10% of the monthly fee.
   - Missed Response Time: Credit of 2% of the monthly fee per incident.
-  - Missed Repair Time: Credit of 3% of the monthly fee per incident."
-5,"Subject: Request for Customization of IMBL Scanner Settings Dear Support Team, We require customization of the IMBL Scanner settings to meet new operational requirements. Could you please provide a quote for this customization service? Best regards, [Customer Name]",Not Billable,"19.5. Reporting
-- Maintenance Reports: The Service Provider shall provide detailed reports after each service visit, including work performed, parts replaced, and any recommendations."
+  - Missed Repair Time: Credit of 3% of the monthly fee per incident.
+
+19.7. Exclusions
+- Scheduled Maintenance: Downtime during agreed-upon scheduled maintenance windows.
+- Force Majeure Events: Downtime resulting from events beyond the Service Provider's control.
+- Client Actions: Downtime caused by the Client's negligence or unauthorized modifications to the Equipment."
+5,"Subject: Request for Customization of IMBL Scanner Settings Dear Support Team, We require customization of the IMBL Scanner settings to meet new operational requirements. Could you please provide a quote for this customization service? Best regards, [Customer Name]",Not Billable,"19.2. Response Times
+- Routine Maintenance Requests: For non-critical issues, the Service Provider shall respond within 24 hours and schedule service within 48 hours."
 6,"Subject: Request for Detailed Monthly Performance Report Dear Support Team, We would like to request a detailed monthly performance report for our IMBL Scanner, as per our Service Level Agreement. Please include all relevant statistics and insights. Thank you. Best regards, [Customer Name]",Not Billable,"19.5. Reporting
 - Maintenance Reports: The Service Provider shall provide detailed reports after each service visit, including work performed, parts replaced, and any recommendations.
 - Monthly Summary: A monthly summary report outlining uptime statistics, incidents, and maintenance activities shall be provided to the Client."
-7,"Subject: Repair Request for IMBL Scanner - Accidental Damage Dear Support Team, Unfortunately, our IMBL Scanner was accidentally dropped, resulting in damage. We need assistance with repairing the unit and would like to know the estimated costs involved. Thank you for your support. Best regards, [Customer Name]",Not Billable,Client Actions: Downtime caused by the Client's negligence or unauthorized modifications to the Equipment.
+7,"Subject: Repair Request for IMBL Scanner - Accidental Damage Dear Support Team, Unfortunately, our IMBL Scanner was accidentally dropped, resulting in damage. We need assistance with repairing the unit and would like to know the estimated costs involved. Thank you for your support. Best regards, [Customer Name]",Not Billable,19.1. Downtime Calculation: Downtime is calculated from the time the Client notifies the Service Provider of an issue until the Equipment is restored to full operational status.
 8,"Subject: Request for Installation and Setup of New IMBL Scanner Dear Support Team, We have acquired a new IMBL Scanner and require installation and setup at our new location. Please provide details on the scheduling and costs for this service. Best regards, [Customer Name]",Billable,"The Service Provider agrees to meet the performance standards outlined in this Service Level Agreement:
-
     19.1. Availability
     - Uptime Guarantee: The Service Provider guarantees that the Equipment will be operational and available for use at least 99% of the scheduled operating hours per month.
-    - Downtime Calculation: Downtime is calculated from the time the Client notifies the Service Provider of an issue until the Equipment is restored to full operational status.
-
-    19.2. Response Times
-    - Emergency Maintenance: For critical issues that render the Equipment non-operational, the Service Provider shall respond within 2 hours of notification and commence repairs within 4 hours.
-    - Routine Maintenance Requests: For non-critical issues, the Service Provider shall respond within 24 hours and schedule service within 48 hours.
-
-    19.3. Repair Times
-    - Critical Repairs: Critical issues shall be resolved within 8 hours from the time of initial response."
-9,"Subject: Request for Remote Troubleshooting - IMBL Scanner Software Issue Dear Support Team, We are encountering a minor software glitch with our IMBL Scanner. Could you please assist us with remote troubleshooting to resolve this issue? Thank you for your prompt support. Best regards, [Customer Name]",Not Billable,"19.2 Response Times - Routine Maintenance Requests: For non-critical issues, the Service Provider shall respond within 24 hours and schedule service within 48 hours."
+    - Downtime Calculation: Downtime is calculated from the time the Client notifies the Service Provider of an issue until the Equipment is restored to full operational status."
+9,"Subject: Request for Remote Troubleshooting - IMBL Scanner Software Issue Dear Support Team, We are encountering a minor software glitch with our IMBL Scanner. Could you please assist us with remote troubleshooting to resolve this issue? Thank you for your prompt support. Best regards, [Customer Name]",Not Billable,"19.2. Response Times
+- Routine Maintenance Requests: For non-critical issues, the Service Provider shall respond within 24 hours and schedule service within 48 hours."
