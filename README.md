@@ -6,8 +6,12 @@
 python main.py init
 ```
 
-2. Ask questions
-...
+2. Ask questions: Just run the command
+It'll load the `questions` CSV column (important - encoding to read is configured based on example file; might need to adjust encoding in fileio/csv.py)
+```bash
+python main.py
+```
+The result will automatically be written into output.csv
 
 Note: To receive debug output, set DEBUG=true
 ```
@@ -18,6 +22,15 @@ export DEBUG=true
 
 - Python 3.11 (https://www.python.org/downloads/release/python-31110/)
 - Ollama (https://ollama.com/)
+- nlm-ingestor running for document parsing (https://github.com/nlmatics/nlm-ingestor/)
+> Pull the docker image
+> ```
+> docker pull ghcr.io/nlmatics/nlm-ingestor:latest
+> ```
+> Run the docker image mapping the port 5001 to port of your choice. 
+> ```
+> docker run -p 5010:5001 ghcr.io/nlmatics/nlm-ingestor:latest-<version>
+> ```
 
 ## Installation
 
