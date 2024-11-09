@@ -50,9 +50,14 @@ class RAG:
 
     def ask(
         self, user_message: str, model_id: str, messages: List[dict], body: dict
-    ) -> Union[str, Generator, Iterator]:
+    ) -> str:
         response_gen = self.pipe(user_message, model_id, messages, body)
         response_text = ''.join(response_gen)
+        # print('response_gen')
+        # print(response_gen)
+        # print('response_text')
+        # print(response_text)
+
         return response_text
 
     def pipe(
@@ -61,7 +66,6 @@ class RAG:
         query_engine = self.index.as_query_engine(streaming=True)
         # chat_engine = self.index.as_chat_engine(streaming=True)
         response = query_engine.query(user_message)
-        print(response)
         return response.response_gen
 
 
@@ -74,9 +78,11 @@ def run_query_sync(query: str, handler = None, expectedAnswer:str = '', expected
     # Evaluate question
     answerObject = evaluate(handler, query, expectedAnswer, expectedContext)
     # Print answer
+    response_text = f'"{answerObject.question}",{"Billable" if answerObject.billable else "Not Billable"},"{answerObject.context}"'
     printAnswer(answerObject)
+    print(response_text)
 
-    response_text = f"{answerObject.question}, {'Billable' if answerObject.billable else 'Not Billable'}, {answerObject.context}"
+
 
     return response_text
 
@@ -97,7 +103,7 @@ def handleQueries() -> str:
         # Ask Question
 
         # Billable
-        break
+        # break
     return
 
 def evaluate( handler, question, expectedAnswer, expectedContext ):
@@ -137,22 +143,22 @@ def handlerReask(question, expectedAnswer, expectedContext) -> answ:
 
     answer = rag.ask(question, model_id, messages, body)
     handler = 'handlerReask'
-    billableAnswer =  rag.ask(f'Say "Yes" or "No": Is "{answer}" part of the contract in the vectorstore', model_id, messages, body)
-    billableAnswer2 =  rag.ask(f'Is "{answer}" billable accoring the vectorstore', model_id, messages, body)
-    exclusions =  rag.ask(f'Is "{question}" handled part of the exclusions at the vectorstore.', model_id, messages, body)
+    billableAnswer =  rag.ask(f'Say "Yes" or "No": Is "{answer}" part of the contract in the vectorstore?', model_id, messages, body)
+    billableAnswer2 =  rag.ask(f'Is "{answer}" billable accoring the vectorstore.', model_id, messages, body)
+    exclusions =  rag.ask(f'Is "{question}" handled part of the exclusions at the vectorstore? Please mention the related paragraph but not the file.', model_id, messages, body)
     # print(billableAnswer)
     # print(billableAnswer2)
     isExcluded = 'yes' in exclusions.lower()
     isBillable = 'yes' in billableAnswer.lower() or 'unclear' in billableAnswer2.lower()
     if isBillable and not isExcluded:
         billable = True
-        context = rag.ask(f'Where is "{answer}" included at the contract in the vectorstore', model_id, messages, body)
+        context = rag.ask(f'Where is "{answer}" included at the contract in the vectorstore? Please mention the related paragraph but not the file.', model_id, messages, body)
     else:
         billable = False
         if isExcluded:
-            context = rag.ask(f'Why is "{answer}" not billable at the contract in the vectorstore', model_id, messages, body)
+            context = rag.ask(f'Why is "{answer}" not billable at the contract in the vectorstore? Please do not repeat text from my answer.', model_id, messages, body)
         else:
-            context = rag.ask(f'Where is "{question}" excluded at the contract in the vectorstore', model_id, messages, body)
+            context = rag.ask(f'Where is "{question}" excluded at the contract in the vectorstore? Please mention the related paragraph but not the file.', model_id, messages, body)
 
     answerObject = answ(handler, question, answer, billable, context, expectedAnswer, expectedContext)
 
