@@ -13,7 +13,7 @@ class DocumentLoader:
         return self._text_splitter.split_documents(documents)
     
     def _chunk_and_store_docs(self, docs: list[Document]):
-        chunked_docs = self.chunk(docs)
+        chunked_docs = self._chunk(docs)
         
         # TODO: now add these to vector DB
     

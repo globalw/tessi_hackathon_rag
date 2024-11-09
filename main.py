@@ -1,6 +1,6 @@
 import argparse
 
-from embeddings.chunking import DocumentLoader
+from embeddings.loader import DocumentLoader
 
 def load_contracts():
     print("Loading contracts...")
