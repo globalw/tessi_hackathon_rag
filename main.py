@@ -19,7 +19,7 @@ class RAG:
 
         self.parameters = self.Parameters(
             LLAMAINDEX_OLLAMA_BASE_URL=os.getenv("LLAMAINDEX_OLLAMA_BASE_URL", "http://localhost:11434"),
-            LLAMAINDEX_MODEL_NAME=os.getenv("LLAMAINDEX_MODEL_NAME", "llama3.2:3b"),
+            LLAMAINDEX_MODEL_NAME=os.getenv("LLAMAINDEX_MODEL_NAME", "llama3.2"),
             LLAMAINDEX_EMBEDDING_MODEL_NAME=os.getenv("LLAMAINDEX_EMBEDDING_MODEL_NAME", "jina/jina-embeddings-v2-base-en:latest"),
         )
 
@@ -52,7 +52,7 @@ def run_query_sync(query: str) -> str:
     rag.on_startup()
 
     user_message = query
-    model_id = "llama3.2:3b"
+    model_id = "llama3.2"
     messages = [{"role": "user", "content": user_message}]
     body = {}
 
