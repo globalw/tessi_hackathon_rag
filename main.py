@@ -1,7 +1,9 @@
 import argparse
 
 from embeddings.loader import DocumentLoader
-from rag.request_evaluator import RequestEvaluator
+from rag.request_evaluator import RequestEvaluator, RequestEvaluationResult, RequestBillability
+
+from fileio.csv import load_csv_rows
 
 from dotenv import load_dotenv
 import os
@@ -30,14 +32,26 @@ if __name__ == "__main__":
     if args.command == "init":
         load_contracts()
     else:
-        # Default behavior
-        query = "Subject: IMBL Scanner Breakdown - Immediate Repair Required Dear Support Team, We are experiencing a sudden breakdown of our IMBL Scanner, rendering it non-operational. We request immediate assistance for emergency repairs to restore functionality as soon as possible. Thank you for your prompt attention to this matter. Best regards, [Customer Name]"
-        
         evaluator = RequestEvaluator()
-        
-        response = evaluator.evaluate_customer_request(
-            request=query,
-        )
+        results: list[dict[str, str]] = []
+        for row in load_csv_rows("./test/qa/QA_billability.csv"):
+            query = row['question']
+            
+            try:
+                response = evaluator.evaluate_customer_request(
+                    request=query,
+                )
+            except Exception as e:
+                response = RequestEvaluationResult(
+                    conclusion = RequestBillability.UNKNOWN,
+                    reason = f"error execution response: {e}"
+                )
 
-        print(f"\nVerdict: {response.conclusion}")
-        print(f"\nReason: {response.reason}")
+            results.append(dict(
+                question=query,
+                classification=response.conclusion,
+                reason=response.reason
+            ))
+        
+        import json
+        print(json.dumps(results, indent=4))
