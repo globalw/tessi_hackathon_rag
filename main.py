@@ -1,70 +1,46 @@
-import os
-from typing import List, Union, Generator, Iterator
-from pydantic import BaseModel
-from llama_index.embeddings.ollama import OllamaEmbedding
-from llama_index.llms.ollama import Ollama
-from llama_index.core import Settings, VectorStoreIndex, SimpleDirectoryReader
+import argparse
 
+from embeddings.chunking import DocumentLoader
+from langchain_community.document_loaders import DirectoryLoader # TODO move into 
+from langchain_community.document_loaders import TextLoader # enough for txt files
 
-class RAG:
+def load_contracts():
+    print("Loading contracts...")
+    dl = DocumentLoader()
 
-    class Parameters(BaseModel):
-        LLAMAINDEX_OLLAMA_BASE_URL: str
-        LLAMAINDEX_MODEL_NAME: str
-        LLAMAINDEX_EMBEDDING_MODEL_NAME: str
+    loader = DirectoryLoader(
+        "./test/dataset/", # Txt files
+        glob="**/*.txt", # loads all .txt files in ./test/dataset/ and all subdirectories (recursively)
+        use_multithreading=True,
+        loader_cls=TextLoader, # only processing text for now, so this is enough
+    )
+    docs = loader.load()
 
-    def __init__(self):
-        self.documents = None
-        self.index = None
+    for doc in docs:
+        print("-------")
+        print(doc)
 
-        self.parameters = self.Parameters(
-            LLAMAINDEX_OLLAMA_BASE_URL=os.getenv("LLAMAINDEX_OLLAMA_BASE_URL", "http://localhost:11434"),
-            LLAMAINDEX_MODEL_NAME=os.getenv("LLAMAINDEX_MODEL_NAME", "llama3.2"),
-            LLAMAINDEX_EMBEDDING_MODEL_NAME=os.getenv("LLAMAINDEX_EMBEDDING_MODEL_NAME", "jina/jina-embeddings-v2-base-en:latest"),
-        )
+    print("===================")
+    print("Chunking")
+    chunked_docs = dl.chunk(docs)
 
-    def on_startup(self):
-        Settings.embed_model = OllamaEmbedding(
-            model_name=self.parameters.LLAMAINDEX_EMBEDDING_MODEL_NAME,
-            base_url=self.parameters.LLAMAINDEX_OLLAMA_BASE_URL,
-        )
-        Settings.llm = Ollama(
-            model=self.parameters.LLAMAINDEX_MODEL_NAME,
-            base_url=self.parameters.LLAMAINDEX_OLLAMA_BASE_URL,
-        )
+    for doc in chunked_docs:
+        print("-------")
+        print(doc)
 
-        self.documents = SimpleDirectoryReader("test/dataset").load_data()
-        self.index = VectorStoreIndex.from_documents(self.documents)
-
-    def on_shutdown(self):
-        pass
-
-    def pipe(
-        self, user_message: str, model_id: str, messages: List[dict], body: dict
-    ) -> Union[str, Generator, Iterator]:
-        query_engine = self.index.as_query_engine(streaming=True)
-        response = query_engine.query(user_message)
-        return response.response_gen
-
-
-def run_query_sync(query: str) -> str:
-    rag = RAG()
-    rag.on_startup()
-
-    user_message = query
-    model_id = "llama3.2"
-    messages = [{"role": "user", "content": user_message}]
-    body = {}
-
-    response_gen = rag.pipe(user_message, model_id, messages, body)
-    response_text = ''.join(response_gen)
-
-    rag.on_shutdown()
-    return response_text
-
+    # TODO: now add these to vector DB
 
 if __name__ == "__main__":
-    query = "Subject: IMBL Scanner Breakdown - Immediate Repair Required Dear Support Team, We are experiencing a sudden breakdown of our IMBL Scanner, rendering it non-operational. We request immediate assistance for emergency repairs to restore functionality as soon as possible. Thank you for your prompt attention to this matter. Best regards, [Customer Name]"
-    response = run_query_sync(query)
-    print("\nResponse:")
-    print(response)
+    parser = argparse.ArgumentParser(description="Run main script with optional 'init' command")
+    parser.add_argument("command", nargs="?", default="run", help="Optional command, e.g., 'init'")
+
+    args = parser.parse_args()
+
+    if args.command == "init":
+        load_contracts()
+    else:
+        # Default behavior
+        query = "Subject: IMBL Scanner Breakdown - Immediate Repair Required Dear Support Team, We are experiencing a sudden breakdown of our IMBL Scanner, rendering it non-operational. We request immediate assistance for emergency repairs to restore functionality as soon as possible. Thank you for your prompt attention to this matter. Best regards, [Customer Name]"
+        # response = run_query_sync(query)
+        # print("\nResponse:")
+        # print(response)

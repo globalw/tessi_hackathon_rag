@@ -1,10 +1,4 @@
-pydantic==2.9.2
-pydantic_core==2.23.4
-llama-index==0.11.15
-llama-index-agent-openai==0.3.4
-llama-index-cli==0.3.1
-llama-index-core==0.11.15
-llama-index-embeddings-ollama==0.3.1
-llama-index-llms-ollama==0.3.3
-llama-index-readers-file==0.2.2
-llama-index-readers-llama-parse==0.3.0
+langchain
+langchain-community
+langchain-ollama # ollama
+langchain-chroma # local vector store
