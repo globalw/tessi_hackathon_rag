@@ -1,7 +1,7 @@
 import argparse
 
 from embeddings.loader import DocumentLoader
-from rag.request_evaluator import RequestEvaluator
+from rag.request_evaluator import RequestEvaluator, RequestEvaluationResult
 
 from dotenv import load_dotenv
 import os
@@ -21,7 +21,7 @@ def load_contracts():
         glob="**/*.txt", # loads all .txt files in ./test/dataset/ and all subdirectories (recursively)
     )
 
-def eval_request(request: str) -> str:
+def eval_request(request: str) -> RequestEvaluationResult:
     evaluator = RequestEvaluator()
     return evaluator.evaluate_customer_request(
         request=request,
@@ -39,4 +39,6 @@ if __name__ == "__main__":
         # Default behavior
         query = "Subject: IMBL Scanner Breakdown - Immediate Repair Required Dear Support Team, We are experiencing a sudden breakdown of our IMBL Scanner, rendering it non-operational. We request immediate assistance for emergency repairs to restore functionality as soon as possible. Thank you for your prompt attention to this matter. Best regards, [Customer Name]"
         response = eval_request(query)
-        print(f"\nResponse: {response}")
+
+        print(f"\nVerdict: {response.conclusion}")
+        print(f"\nReason: {response.reason}")
