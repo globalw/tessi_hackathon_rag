@@ -48,7 +48,22 @@ class RAG:
         return response.response_gen
 
 
-def run_query_sync(query: str) -> str:
+def run_query_sync(query: str, top_k: int = 5) -> str:
+     rag = RAG()
+     rag.on_startup()
+     
+     user_message = query
+     model_id = "llama3.2:3b"
+     messages = [{"role": "user", "content": user_message}]
+     body = {}
+     
+     response_gen = rag.pipe(user_message, model_id, messages, body, top_k=top_k)
+     response_text = ''.join(response_gen)
+
+     rag.on_shutdown()
+     return response_text
+
+def run_query_sync_old(query: str) -> str:
     rag = RAG()
     rag.on_startup()
 
