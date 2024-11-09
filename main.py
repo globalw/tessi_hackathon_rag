@@ -1,34 +1,15 @@
 import argparse
 
 from embeddings.chunking import DocumentLoader
-from langchain_community.document_loaders import DirectoryLoader # TODO move into 
-from langchain_community.document_loaders import TextLoader # enough for txt files
 
 def load_contracts():
     print("Loading contracts...")
     dl = DocumentLoader()
-
-    loader = DirectoryLoader(
-        "./test/dataset/", # Txt files
+    
+    dl.load_directory(
+        path="./test/dataset/",  # Txt files
         glob="**/*.txt", # loads all .txt files in ./test/dataset/ and all subdirectories (recursively)
-        use_multithreading=True,
-        loader_cls=TextLoader, # only processing text for now, so this is enough
     )
-    docs = loader.load()
-
-    for doc in docs:
-        print("-------")
-        print(doc)
-
-    print("===================")
-    print("Chunking")
-    chunked_docs = dl.chunk(docs)
-
-    for doc in chunked_docs:
-        print("-------")
-        print(doc)
-
-    # TODO: now add these to vector DB
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run main script with optional 'init' command")
