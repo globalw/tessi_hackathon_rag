@@ -45,8 +45,8 @@ if __name__ == "__main__":
 
         # overwriting this here as it should be written according to the challenge rules, but original definitions differ to make it easier for the LLM
         billability_results = {
-            RequestBillability.BILLABLE: "billable", # included in the contract
-            RequestBillability.UNBILLABLE: "unbillable", # not included in the contract
+            RequestBillability.BILLABLE: "Billable", # included in the contract
+            RequestBillability.UNBILLABLE: "Not Billable", # not included in the contract
             RequestBillability.UNKNOWN: "?" # needs manual review
         }
 
