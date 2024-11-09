@@ -17,6 +17,8 @@ class DocumentLoader:
     def _chunk_and_store_docs(self, docs: list[Document]):
         chunked_docs = self._chunk(docs)
 
+        print(f"Created {len(chunked_docs)} chunks from provided docs")
+
         vdb = get_vector_db()
         
         vdb.add_documents(documents=chunked_docs) # optionally I could specify IDs via ID parameter, but won't -- updating vector store is considered out of scope
@@ -30,5 +32,7 @@ class DocumentLoader:
         )
 
         docs = loader.load()
+
+        print(f"Loaded {len(docs)} documents")
 
         self._chunk_and_store_docs(docs)
