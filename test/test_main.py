@@ -1,9 +1,10 @@
 import unittest
 import pandas as pd
-from main import run_query_sync
 from deepeval import evaluate
 from deepeval.test_case import LLMTestCase
 from deepeval.metrics import AnswerRelevancyMetric
+
+from ..main import RequestEvaluator
 
 def evaluate_relevancy(response: str, expected_answer: str) -> float:
     test_case = LLMTestCase(
@@ -22,13 +23,11 @@ class TestRAGSync(unittest.TestCase):
         cls.qa_data = pd.read_csv('qa/QA_billability.csv')
 
     def test_csv_queries(self):
+        evaluator = RequestEvaluator()
         for index, row in self.qa_data.iterrows():
             with self.subTest(question=row['question']):
                 print(f"Running query: {row['question']}")
-                response = run_query_sync(f"The following is an email. The customer is writing a subject and request."
-                                          f"In order to comply you must first evaluate if the request is billable. "
-                                          f"Once you have evaluated why the request in the email is billable or non-billable,"
-                                          f"explain why. Beginning of email: {row['question']} End of email.")
+                response = evaluator.evaluate_customer_request(row['question']).conclusion
                 self.assertIsInstance(response, str)
                 self.assertTrue(len(response) > 0, "The response should not be empty")
                 print(f"Response: {response}")
