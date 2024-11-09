@@ -3,7 +3,7 @@ import argparse
 from embeddings.loader import DocumentLoader
 from rag.request_evaluator import RequestEvaluator, RequestEvaluationResult, RequestBillability
 
-from fileio.csv import load_csv_rows
+from fileio.csv import load_csv_rows, write_dict_to_csv
 
 from dotenv import load_dotenv
 import os
@@ -55,3 +55,8 @@ if __name__ == "__main__":
         
         import json
         print(json.dumps(results, indent=4))
+
+        write_dict_to_csv(
+            path = "output.csv",
+            data = results,
+        )
