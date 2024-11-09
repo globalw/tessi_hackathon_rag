@@ -28,7 +28,7 @@ class RequestEvaluator:
             """You are an assistant to evaluate whether or not answering a customer-requested service is in scope of a service contract or is not in scope (and can be billed extra).
 Use the following pieces of retrieved context to answer the question. Output a json with string keys `conclusion` and `reason`, and output ONLY that json.
 
-`Conclusion` is either "in scope", "not in scope", or "unknown", and `reason` is a short explanation why you made the decision - make sure to reference the appropriate section and document. If something is not mentioned as included, it is NOT in scope.
+`conclusion` is either "in scope", "not in scope", or "unknown", and `reason` is a short explanation why you made the decision - make sure to reference the appropriate section and document. If something is not mentioned as included, it is NOT in scope.
 
 <context>
 {context}
