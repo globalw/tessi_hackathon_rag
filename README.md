@@ -9,6 +9,10 @@ python main.py init
 2. Ask questions
 ...
 
+Note: To receive debug output, set DEBUG=true
+```
+export DEBUG=true
+```
 
 # Pre-requisites
 

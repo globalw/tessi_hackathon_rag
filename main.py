@@ -1,6 +1,16 @@
 import argparse
 
 from embeddings.loader import DocumentLoader
+from rag.request_evaluator import RequestEvaluator
+
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+if(os.getenv("DEBUG") == "true"):
+    import langchain
+    langchain.debug = True
 
 def load_contracts():
     print("Loading contracts...")
