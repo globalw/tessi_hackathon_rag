@@ -26,21 +26,19 @@ class RequestEvaluator:
     def __init__(self):
         self._rag_prompt = ChatPromptTemplate.from_template(
             """You are an assistant to evaluate whether or not answering a customer-requested service is in scope of a service contract or is not in scope (and can be billed extra).
-Use the following pieces of retrieved context to answer the question.
+Use the following pieces of retrieved context to answer the question. Output a json with string keys `conclusion` and `reason`, and output ONLY that json.
 
-`Conclusion` is either "in scope", "not in scope", or "unknown", and `reason` is a short explanation why you made the decision - make sure to reference the appropriate section and document.
+`Conclusion` is either "in scope", "not in scope", or "unknown", and `reason` is a short explanation why you made the decision - make sure to reference the appropriate section and document. If something is not mentioned as included, it is NOT in scope.
 
 <context>
 {context}
 </context>
 
-Determine if the following customer request is "in scope" or "not in scope". If the contract covers the request, set `conclusion` to "in scope", if not, set it to "not in scope". If you don't know the answer, just set it to "unknown".
+Determine if the following customer request is "in scope" or "not in scope". If the contract covers the request, set `conclusion` to "in scope", if not, set it to "not in scope". If you don't know the answer, just set it to "unknown". Remember to output the json with two keys! - `conclusion` and `reason`.
 
 <question>
 {question}
 </question>
-
-{format_instructions}
 """
         )
 
@@ -71,13 +69,13 @@ Determine if the following customer request is "in scope" or "not in scope". If 
 
         parser = PydanticOutputParser(pydantic_object=RequestEvaluationResult)
 
-        prompt = self._rag_prompt.partial(
-            format_instructions = parser.get_format_instructions()
-        )
+        # prompt = self._rag_prompt.partial(
+        #     format_instructions = parser.get_format_instructions()
+        # )
 
         chain = (
             {"context": retriever | self._format_docs, "question": RunnablePassthrough()}
-            | prompt
+            | self._rag_prompt
             | self._model
             | parser
         )
