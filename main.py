@@ -48,27 +48,36 @@ class RAG:
     def on_shutdown(self):
         pass
 
+    def ask(
+        self, user_message: str, model_id: str, messages: List[dict], body: dict
+    ) -> Union[str, Generator, Iterator]:
+        response_gen = self.pipe(user_message, model_id, messages, body)
+        response_text = ''.join(response_gen)
+        return response_text
+
     def pipe(
         self, user_message: str, model_id: str, messages: List[dict], body: dict
     ) -> Union[str, Generator, Iterator]:
         query_engine = self.index.as_query_engine(streaming=True)
+        # chat_engine = self.index.as_chat_engine(streaming=True)
         response = query_engine.query(user_message)
+        print(response)
         return response.response_gen
 
 
-def run_query_sync(query: str) -> str:
-    rag = RAG()
-    rag.on_startup()
+def run_query_sync(query: str, handler = None, expectedAnswer:str = '', expectedContext:str = '') -> str:
 
-    user_message = query
-    model_id = "llama3.2:3b"
-    messages = [{"role": "user", "content": user_message}]
-    body = {}
+    if handler is None:
+        # No handler passed -> use default
+        handler = handlerReask
 
-    response_gen = rag.pipe(user_message, model_id, messages, body)
-    response_text = ''.join(response_gen)
+    # Evaluate question
+    answerObject = evaluate(handler, query, expectedAnswer, expectedContext)
+    # Print answer
+    printAnswer(answerObject)
 
-    rag.on_shutdown()
+    response_text = f"{answerObject.question}, {'Billable' if answerObject.billable else 'Not Billable'}, {answerObject.context}"
+
     return response_text
 
 def handleQueries() -> str:
@@ -81,12 +90,14 @@ def handleQueries() -> str:
         expectedAnswer = QaBillability["expected_answer"][idx]
         expectedContext = QaBillability["context"][idx]
         for handler in handlerList:
-            answerObject = evaluate(handler, query, expectedAnswer, expectedContext)
-            printAnswer(answerObject)
+            run_query_sync(query, handler, expectedAnswer, expectedContext)
+
+            # answerObject = evaluate(handler, query, expectedAnswer, expectedContext)
+            # printAnswer(answerObject)
         # Ask Question
 
         # Billable
-        # break
+        break
     return
 
 def evaluate( handler, question, expectedAnswer, expectedContext ):
@@ -97,7 +108,7 @@ def printAnswer( answerObject: answ ):
     print(f"\n------- {answerObject.handler} -------")
     print(f"Question: {answerObject.question}")
     print(f"Response: {answerObject.answer}")
-    print(f"Billable: {answerObject.billable}")
+    print(f"Billable: {'Billable' if answerObject.billable else 'Not Billable'}")
     print(f"Context: {answerObject.context}")
     print(f"Expected answer: {answerObject.expectedAnswer}")
     print(f"Expected context: {answerObject.expectedContext}")
@@ -108,23 +119,39 @@ def printAnswer( answerObject: answ ):
 def handlerDummy(question, expectedAnswer, expectedContext) -> answ:
     handler = 'handlerDummy'
     answer = 'No answer'
-    billable = 'Yes'
+    billable = True
     context = 'We bill everything.'
     answerObject = answ(handler, question, answer, billable, context, expectedAnswer, expectedContext)
     return answerObject
 
 def handlerReask(question, expectedAnswer, expectedContext) -> answ:
-    answer = run_query_sync(question)
+    # Instancate object
+    rag = RAG()
+    rag.on_startup()
+
+    # Prepare values
+    user_message = question
+    model_id = "llama3.2:3b"
+    messages = [{"role": "user", "content": user_message}]
+    body = {}
+
+    answer = rag.ask(question, model_id, messages, body)
     handler = 'handlerReask'
-    billableAnswer = run_query_sync(f'Is "{answer}" part of the contract in the vectorstore')
-    print(billableAnswer)
-    if 'yes' in billableAnswer.lower():
-        billable = 'Yes'
-        context = run_query_sync(f'Where is "{answer}" included at the contract in the vectorstore')
+    billableAnswer =  rag.ask(f'Say "Yes" or "No": Is "{answer}" part of the contract in the vectorstore', model_id, messages, body)
+    billableAnswer2 =  rag.ask(f'Is "{answer}" billable accoring the vectorstore', model_id, messages, body)
+    # print(billableAnswer)
+    # print(billableAnswer2)
+    if 'yes' in billableAnswer.lower() or 'unclear' in billableAnswer2.lower():
+        billable = True
+        context = rag.ask(f'Where is "{answer}" included at the contract in the vectorstore', model_id, messages, body)
     else:
-        billable = 'No'
-        context = 'The service is not part of the contract.'
+        billable = False
+        context = rag.ask(f'Why is "{answer}" not billable', model_id, messages, body)
+
     answerObject = answ(handler, question, answer, billable, context, expectedAnswer, expectedContext)
+
+    rag.on_shutdown()
+
     return answerObject
 
 if __name__ == "__main__":
