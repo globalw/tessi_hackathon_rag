@@ -1,70 +1,81 @@
-import os
-from typing import List, Union, Generator, Iterator
-from pydantic import BaseModel
-from llama_index.embeddings.ollama import OllamaEmbedding
-from llama_index.llms.ollama import Ollama
-from llama_index.core import Settings, VectorStoreIndex, SimpleDirectoryReader
+import argparse
 
+from embeddings.loader import DocumentLoader
+from rag.request_evaluator import RequestEvaluator, RequestEvaluationResult, RequestBillability
 
-class RAG:
+from fileio.csv import load_csv_rows, write_dict_to_csv
 
-    class Parameters(BaseModel):
-        LLAMAINDEX_OLLAMA_BASE_URL: str
-        LLAMAINDEX_MODEL_NAME: str
-        LLAMAINDEX_EMBEDDING_MODEL_NAME: str
+from config.config import settings
 
-    def __init__(self):
-        self.documents = None
-        self.index = None
+if settings.DEBUG:
+    import langchain
+    langchain.debug = True
 
-        self.parameters = self.Parameters(
-            LLAMAINDEX_OLLAMA_BASE_URL=os.getenv("LLAMAINDEX_OLLAMA_BASE_URL", "http://localhost:11434"),
-            LLAMAINDEX_MODEL_NAME=os.getenv("LLAMAINDEX_MODEL_NAME", "llama3.2:3b"),
-            LLAMAINDEX_EMBEDDING_MODEL_NAME=os.getenv("LLAMAINDEX_EMBEDDING_MODEL_NAME", "jina/jina-embeddings-v2-base-en:latest"),
-        )
+def load_contracts():
+    print("Loading contracts...")
+    dl = DocumentLoader()
+    
+    # dl.load_directory(
+    #     path="./test/dataset/",  # Txt files
+    #     glob="**/*.txt", # loads all .txt files in ./test/dataset/ and all subdirectories (recursively)
+    # )
 
-    def on_startup(self):
-        Settings.embed_model = OllamaEmbedding(
-            model_name=self.parameters.LLAMAINDEX_EMBEDDING_MODEL_NAME,
-            base_url=self.parameters.LLAMAINDEX_OLLAMA_BASE_URL,
-        )
-        Settings.llm = Ollama(
-            model=self.parameters.LLAMAINDEX_MODEL_NAME,
-            base_url=self.parameters.LLAMAINDEX_OLLAMA_BASE_URL,
-        )
+    dl.load_file_new(
+        "./dataset/bak/Maintenance_Service_Agreement.docx"
+    )
 
-        self.documents = SimpleDirectoryReader("test/dataset").load_data()
-        self.index = VectorStoreIndex.from_documents(self.documents)
-
-    def on_shutdown(self):
-        pass
-
-    def pipe(
-        self, user_message: str, model_id: str, messages: List[dict], body: dict
-    ) -> Union[str, Generator, Iterator]:
-        query_engine = self.index.as_query_engine(streaming=True)
-        response = query_engine.query(user_message)
-        return response.response_gen
-
-
-def run_query_sync(query: str) -> str:
-    rag = RAG()
-    rag.on_startup()
-
-    user_message = query
-    model_id = "llama3.2:3b"
-    messages = [{"role": "user", "content": user_message}]
-    body = {}
-
-    response_gen = rag.pipe(user_message, model_id, messages, body)
-    response_text = ''.join(response_gen)
-
-    rag.on_shutdown()
-    return response_text
-
+    dl.load_file_new(
+        "./test/dataset/Project_Setup_Contract.txt"
+    )
 
 if __name__ == "__main__":
-    query = "Subject: IMBL Scanner Breakdown - Immediate Repair Required Dear Support Team, We are experiencing a sudden breakdown of our IMBL Scanner, rendering it non-operational. We request immediate assistance for emergency repairs to restore functionality as soon as possible. Thank you for your prompt attention to this matter. Best regards, [Customer Name]"
-    response = run_query_sync(query)
-    print("\nResponse:")
-    print(response)
+    parser = argparse.ArgumentParser(description="Run main script with optional 'init' command")
+    parser.add_argument("command", nargs="?", default="run", help="Optional command, e.g., 'init'")
+
+    if(settings.DEBUG):
+        print("STARTED IN VERBOSE DEBUG MODE")
+
+    args = parser.parse_args()
+
+    if args.command == "init":
+        load_contracts()
+    else:
+        evaluator = RequestEvaluator()
+        results: list[dict[str, str]] = []
+
+        # overwriting this here as it should be written according to the challenge rules, but original definitions differ to make it easier for the LLM
+        billability_results = {
+            RequestBillability.BILLABLE: "Billable", # included in the contract
+            RequestBillability.UNBILLABLE: "Not Billable", # not included in the contract
+            RequestBillability.UNKNOWN: "?" # needs manual review
+        }
+
+        print("Evaluating requests")
+        for row in load_csv_rows("./test/qa/QA_billability.csv"):
+            query = row['question']
+            
+            try:
+                response = evaluator.evaluate_customer_request(
+                    request=query,
+                )
+            except Exception as e:
+                response = RequestEvaluationResult(
+                    conclusion = "?",
+                    reason = f"error execution response: {str(e).replace('\n', ' ')}"
+                )
+
+            results.append(dict(
+                question=query,
+                classification=billability_results.get(response.conclusion),
+                reason=response.reason
+            ))
+        
+        if settings.DEBUG:
+            import json
+            print(json.dumps(results, indent=4))
+
+        print("Writing output to csv")
+        write_dict_to_csv(
+            path = "output.csv",
+            data = results,
+        )
