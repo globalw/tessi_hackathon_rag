@@ -10,8 +10,8 @@ from enum import Enum
 from vector_db.db import get_vector_db
 
 class RequestBillability(str, Enum):
-    BILLABLE = "covered"
-    UNBILLABLE = "not covered"
+    BILLABLE = "in scope"
+    UNBILLABLE = "not in scope"
     UNKNOWN = "unknown"
 
     @classmethod
@@ -25,18 +25,16 @@ class RequestEvaluationResult(BaseModel):
 class RequestEvaluator:
     def __init__(self):
         self._rag_prompt = ChatPromptTemplate.from_template(
-            """You are an assistant to evaluate whether or not answering a certain customer request is covered in a service contract or is not covered and can be billed extra.
+            """You are an assistant to evaluate whether or not answering a customer-requested service is in scope of a service contract or is not in scope (and can be billed extra).
 Use the following pieces of retrieved context to answer the question.
 
-    `Conclusion` is either "covered", "not covered", or "unknown", and `reason` is a short explanation why you made the decision.
-
-If the contract covers the request, set `conclusion` to "covered", if not, set it to "not covered". If you don't know the answer, just set it to "unknown". Only reply in a single word.
+`Conclusion` is either "in scope", "not in scope", or "unknown", and `reason` is a short explanation why you made the decision - make sure to reference the appropriate section and document.
 
 <context>
 {context}
 </context>
 
-Determine if the following customer request is "covered" or "not covered". If you don't know, it's "unknown":
+Determine if the following customer request is "in scope" or "not in scope". If the contract covers the request, set `conclusion` to "in scope", if not, set it to "not in scope". If you don't know the answer, just set it to "unknown".
 
 <question>
 {question}

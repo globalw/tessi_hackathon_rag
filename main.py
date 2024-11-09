@@ -60,13 +60,13 @@ if __name__ == "__main__":
                 )
             except Exception as e:
                 response = RequestEvaluationResult(
-                    conclusion = RequestBillability.UNKNOWN,
-                    reason = f"error execution response: {e}"
+                    conclusion = "?",
+                    reason = f"error execution response: {str(e).replace('\n', ' ')}"
                 )
 
             results.append(dict(
                 question=query,
-                classification=response.conclusion,
+                classification=billability_results.get(response.conclusion),
                 reason=response.reason
             ))
         

@@ -1,12 +1,18 @@
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+print("load .env" if load_dotenv(
+    dotenv_path = "./.env"
+) else "no .env found")
 
 class Settings:
     DEBUG: bool = False
 
-settings = Settings()
+    def __init__(self, DEBUG: bool):
+        self.DEBUG = DEBUG
 
-if(os.getenv("DEBUG") == "true"):
-    settings.DEBUG = True
+settings = Settings(
+    DEBUG = os.getenv("DEBUG", "false") == "true"
+)
+
+print(f"populated settings: {settings.__dict__}")
