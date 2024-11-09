@@ -139,14 +139,20 @@ def handlerReask(question, expectedAnswer, expectedContext) -> answ:
     handler = 'handlerReask'
     billableAnswer =  rag.ask(f'Say "Yes" or "No": Is "{answer}" part of the contract in the vectorstore', model_id, messages, body)
     billableAnswer2 =  rag.ask(f'Is "{answer}" billable accoring the vectorstore', model_id, messages, body)
+    exclusions =  rag.ask(f'Is "{question}" handled part of the exclusions at the vectorstore.', model_id, messages, body)
     # print(billableAnswer)
     # print(billableAnswer2)
-    if 'yes' in billableAnswer.lower() or 'unclear' in billableAnswer2.lower():
+    isExcluded = 'yes' in exclusions.lower()
+    isBillable = 'yes' in billableAnswer.lower() or 'unclear' in billableAnswer2.lower()
+    if isBillable and not isExcluded:
         billable = True
         context = rag.ask(f'Where is "{answer}" included at the contract in the vectorstore', model_id, messages, body)
     else:
         billable = False
-        context = rag.ask(f'Why is "{answer}" not billable', model_id, messages, body)
+        if isExcluded:
+            context = rag.ask(f'Why is "{answer}" not billable at the contract in the vectorstore', model_id, messages, body)
+        else:
+            context = rag.ask(f'Where is "{question}" excluded at the contract in the vectorstore', model_id, messages, body)
 
     answerObject = answ(handler, question, answer, billable, context, expectedAnswer, expectedContext)
 
