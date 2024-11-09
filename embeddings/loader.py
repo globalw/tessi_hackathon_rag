@@ -4,6 +4,8 @@ from langchain_core.documents import Document
 from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.document_loaders import TextLoader # enough for txt files
 
+from vector_db.db import get_vector_db
+
 class DocumentLoader:
     def __init__(self):
         self._text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=0)
@@ -14,8 +16,10 @@ class DocumentLoader:
     
     def _chunk_and_store_docs(self, docs: list[Document]):
         chunked_docs = self._chunk(docs)
+
+        vdb = get_vector_db()
         
-        # TODO: now add these to vector DB
+        vdb.add_documents(documents=chunked_docs) # optionally I could specify IDs via ID parameter, but won't -- updating vector store is considered out of scope
     
     def load_directory(self, path: str, glob: str):
         loader = DirectoryLoader(
