@@ -1,9 +1,12 @@
 import os
 from typing import List, Union, Generator, Iterator
+
+import pandas as pd
 from pydantic import BaseModel
 from llama_index.embeddings.ollama import OllamaEmbedding
 from llama_index.llms.ollama import Ollama
 from llama_index.core import Settings, VectorStoreIndex, SimpleDirectoryReader
+from prompt_builder import PromptBuilder
 
 
 class RAG:
@@ -31,6 +34,7 @@ class RAG:
         Settings.llm = Ollama(
             model=self.parameters.LLAMAINDEX_MODEL_NAME,
             base_url=self.parameters.LLAMAINDEX_OLLAMA_BASE_URL,
+            request_timeout=3000,
         )
 
         self.documents = SimpleDirectoryReader("test/dataset").load_data()
@@ -64,7 +68,12 @@ def run_query_sync(query: str) -> str:
 
 
 if __name__ == "__main__":
-    query = "Subject: IMBL Scanner Breakdown - Immediate Repair Required Dear Support Team, We are experiencing a sudden breakdown of our IMBL Scanner, rendering it non-operational. We request immediate assistance for emergency repairs to restore functionality as soon as possible. Thank you for your prompt attention to this matter. Best regards, [Customer Name]"
-    response = run_query_sync(query)
+    response = ""
+    index = 0
+
+    for prompt in PromptBuilder().build_prompts():
+        print(prompt)
+        response += run_query_sync(prompt)
+
     print("\nResponse:")
     print(response)
