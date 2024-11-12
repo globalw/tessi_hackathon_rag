@@ -36,6 +36,8 @@ class RAG:
         self.documents = SimpleDirectoryReader("test/dataset").load_data()
         self.index = VectorStoreIndex.from_documents(self.documents)
 
+
+
     def on_shutdown(self):
         pass
 
@@ -63,8 +65,42 @@ def run_query_sync(query: str) -> str:
     return response_text
 
 
+
+import csv
+import os
+
 if __name__ == "__main__":
-    query = "Subject: IMBL Scanner Breakdown - Immediate Repair Required Dear Support Team, We are experiencing a sudden breakdown of our IMBL Scanner, rendering it non-operational. We request immediate assistance for emergency repairs to restore functionality as soon as possible. Thank you for your prompt attention to this matter. Best regards, [Customer Name]"
-    response = run_query_sync(query)
-    print("\nResponse:")
-    print(response)
+    query = "Subject: Request for Software Upgrade on IMBL Scanner Dear Support Team, We would like to upgrade our IMBL Scanner software to the latest version available. Kindly provide details on the upgrade process and any associated costs. Looking forward to your response. Best regards,"
+
+    # Erste Abfrage
+    firstResponse = run_query_sync(query)
+
+    # Billable-Abfrage
+    billableQuery = f"Evaluate if the following query is billable or non-billable. Answer with unknown if it isn't a real problem or it doesn't fit into either billable or non-billable. Only give one word as an answer (BILLABLE, NON-BILLABLE, or UNKNOWN): {query}"
+    secondResponse = run_query_sync(billableQuery)
+
+    # Kontext-Abfrage
+    reasoning = "Provide the exact article number, from which you based your decision for the billability on and the article's content"
+    thirdResponse = run_query_sync(reasoning)
+
+    # Ausgabe des Billable-Status
+    print("\nSecond Response (Billable Status):")
+    print(secondResponse)
+
+    # Speichere query, response und Kontext in einer CSV-Datei
+    file_exists = os.path.isfile("responses.csv")
+    with open("responses.csv", mode="a", newline="") as responsesFile:
+        fieldnames = ["query", "firstResponse", "expected_answer", "reasoning"]
+        writer = csv.DictWriter(responsesFile, fieldnames=fieldnames)
+
+        # Schreibe die Kopfzeile nur, wenn die Datei neu erstellt wurde
+        if not file_exists:
+            writer.writeheader()
+
+        # Schreibe die Daten in die entsprechenden Spalten
+        writer.writerow({
+            "query": query,
+            "firstResponse": firstResponse,
+            "expected_answer": secondResponse,
+            "reasoning": thirdResponse
+        })
