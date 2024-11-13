@@ -32,11 +32,11 @@ class RAG:
     def on_startup(self, model_id):
         # Initialize the embedding model and LLM
         embed_model = OllamaEmbedding(
-            model_name=model_id,
+            model_name=self.parameters.LLAMAINDEX_EMBEDDING_MODEL_NAME,
             base_url=self.parameters.LLAMAINDEX_OLLAMA_BASE_URL,
         )
         llm = Ollama(
-            model=self.parameters.LLAMAINDEX_MODEL_NAME,
+            model=model_id,
             base_url=self.parameters.LLAMAINDEX_OLLAMA_BASE_URL,
         )
 
@@ -137,12 +137,9 @@ def main():
         }
     """
 
-    max_iterations = 8  # Define maximum number of iterations for running the test
+    max_iterations = 80  # Define maximum number of iterations for running the test
     model_sizes = [
-        "llama3.2:1b-instruct-q2_K",
-        "llama3.2:1b-instruct-q4_1",
-        "llama3.2:1b",
-        "llama3.2:3b-instruct-q4_1",
+        "llama3.2:1b"
         "llama3.2:3b",
         "llama3.1:8b"
     ]
